@@ -57,6 +57,71 @@ export default Example;`} />
 - Real-time color preview
 - Fully customizable through className and props
 
+## Examples
+
+### Color Picker Input
+
+<Preview name="color-picker" code={`'use client';
+
+import {
+  ColorPicker,
+  ColorPickerSelection,
+  ColorPickerHue,
+  ColorPickerAlpha,
+  ColorPickerOutput,
+  ColorPickerEyeDropper,
+  ColorPickerFormat,
+} from '@/components/ui/kibo-ui/color-picker';
+import { Input } from '@/components/ui/input';
+import Color from 'color';
+import { useState } from 'react';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+
+const Example = () => {
+  const [color, setColor] = useState('#000000');
+
+  const handleValueChange = (value: string) => {
+    console.log(value);
+    setColor(Color(value).hex());
+  };
+
+  return (
+    <div className="flex w-full h-screen justify-center items-start gap-4 bg-secondary p-4">
+      <Popover>
+        <PopoverTrigger>
+          <div className="relative">
+            <div className="w-6 h-6 rounded border border-foreground/10 bg-secondary absolute top-1/2 left-2 -translate-y-1/2" style={{ backgroundColor: color }} />
+            <Input placeholder="Pick a color" value={color} onChange={(e) => setColor(e.target.value)} className="pl-10 bg-background" />
+          </div>
+        </PopoverTrigger>
+        <PopoverContent>
+          <ColorPicker className="w-full" value={color} onValueChange={handleValueChange}>
+            <ColorPickerSelection />
+            <div className="flex items-center gap-4">
+              <ColorPickerEyeDropper />
+              <div className="w-full grid gap-1">
+                <ColorPickerHue />
+                <ColorPickerAlpha />
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <ColorPickerOutput />
+              <ColorPickerFormat />
+            </div>
+          </ColorPicker>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+};
+
+export default Example;`} />
+
+
 ## Props
 
 The color picker is made up of the following subcomponents:
