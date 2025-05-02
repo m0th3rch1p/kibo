@@ -6,7 +6,7 @@
   "author": "Hayden Bleasel <hello@haydenbleasel.com>",
   "registryDependencies": [],
   "dependencies": [
-    "@radix-ui/react-portal",
+    "@radix-ui/react-use-controllable-state",
     "lucide-react",
     "radix-ui"
   ],
