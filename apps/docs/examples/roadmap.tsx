@@ -221,6 +221,7 @@ const exampleFeatures = (() => {
         product: faker.helpers.arrayElement(exampleProducts),
         initiative: faker.helpers.arrayElement(exampleInitiatives),
         release: faker.helpers.arrayElement(exampleReleases),
+        dependencies: undefined as string[] | undefined,
       };
 
       // Some random features might also have dependencies
@@ -417,8 +418,7 @@ const GanttView = () => {
                             {feature.dependencies?.length && (
                               <GitBranchIcon 
                                 className="text-muted-foreground shrink-0" 
-                                size={12} 
-                                title={`${feature.dependencies.length} dependencies`}
+                                size={12}
                               />
                             )}
                             {(() => {
@@ -426,8 +426,7 @@ const GanttView = () => {
                               return !validation.isValid && (
                                 <AlertTriangleIcon 
                                   className="text-destructive shrink-0" 
-                                  size={12} 
-                                  title={`Dependency conflicts: ${validation.conflicts.join('; ')}`}
+                                  size={12}
                                 />
                               );
                             })()}
