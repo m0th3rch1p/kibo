@@ -25,7 +25,9 @@ const TreeContext = createContext<TreeContextType>({
 
 export type TreeProps = ComponentProps<typeof Collapsible>;
 
-export const Tree = forwardRef<React.ElementRef<typeof Collapsible>, TreeProps>(
+export const Tree: React.ForwardRefExoticComponent<
+  TreeProps & React.RefAttributes<HTMLDivElement>
+> = forwardRef<HTMLDivElement, TreeProps>(
   ({ children, className, ...props }, ref) => {
     return (
       <TreeContext.Provider value={{ level: 0 }}>
@@ -95,10 +97,10 @@ export type TreeTriggerProps = ComponentProps<typeof CollapsibleTrigger> & {
   icon?: React.ReactNode;
 };
 
-export const TreeTrigger = forwardRef<
-  React.ElementRef<typeof CollapsibleTrigger>,
-  TreeTriggerProps
->(({ children, className, icon, ...props }, ref) => {
+export const TreeTrigger: React.ForwardRefExoticComponent<
+  TreeTriggerProps & React.RefAttributes<HTMLButtonElement>
+> = forwardRef<HTMLButtonElement, TreeTriggerProps>(
+  ({ children, className, icon, ...props }, ref) => {
   const { level } = useContext(TreeContext);
 
   return (
@@ -123,10 +125,10 @@ TreeTrigger.displayName = 'TreeTrigger';
 
 export type TreeContentProps = ComponentProps<typeof CollapsibleContent>;
 
-export const TreeContent = forwardRef<
-  React.ElementRef<typeof CollapsibleContent>,
-  TreeContentProps
->(({ children, className, ...props }, ref) => {
+export const TreeContent: React.ForwardRefExoticComponent<
+  TreeContentProps & React.RefAttributes<HTMLDivElement>
+> = forwardRef<HTMLDivElement, TreeContentProps>(
+  ({ children, className, ...props }, ref) => {
   return (
     <CollapsibleContent
       className={cn('tree-content', className)}
