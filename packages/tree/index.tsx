@@ -29,7 +29,12 @@ export const Tree = forwardRef<React.ElementRef<typeof Collapsible>, TreeProps>(
   ({ children, className, ...props }, ref) => {
     return (
       <TreeContext.Provider value={{ level: 0 }}>
-        <div className={cn('tree-root', className)} ref={ref} {...props}>
+        <div
+          className={cn('tree-root', className)}
+          data-slot="tree"
+          ref={ref}
+          {...props}
+        >
           {children}
         </div>
       </TreeContext.Provider>
@@ -71,6 +76,7 @@ export const TreeItem = forwardRef<
       <TreeContext.Provider value={{ level: level + 1 }}>
         <Collapsible
           className={cn('tree-item', className)}
+          data-slot="tree-item"
           onOpenChange={onOpenChange}
           open={open}
           ref={ref}
@@ -101,6 +107,7 @@ export const TreeTrigger = forwardRef<
         'tree-trigger flex w-full items-center gap-1 rounded-md px-2 py-1 text-left text-sm hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg.tree-chevron]:rotate-90',
         className
       )}
+      data-slot="tree-trigger"
       ref={ref}
       style={{ paddingLeft: `${level * 12 + 8}px` }}
       {...props}
@@ -123,6 +130,7 @@ export const TreeContent = forwardRef<
   return (
     <CollapsibleContent
       className={cn('tree-content', className)}
+      data-slot="tree-content"
       ref={ref}
       {...props}
     >
@@ -147,6 +155,7 @@ export const TreeLeaf = forwardRef<HTMLDivElement, TreeLeafProps>(
           'tree-leaf flex items-center gap-1 rounded-md px-2 py-1 text-sm hover:bg-accent hover:text-accent-foreground',
           className
         )}
+        data-slot="tree-leaf"
         ref={ref}
         style={{ paddingLeft: `${level * 12 + 32}px` }}
         {...props}
