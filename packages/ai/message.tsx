@@ -4,17 +4,15 @@ import {
   AvatarImage,
 } from '@repo/shadcn-ui/components/ui/avatar';
 import { Button } from '@repo/shadcn-ui/components/ui/button';
-import type { ComponentProps, HTMLAttributes, ReactNode } from 'react';
-import { 
-  CopyIcon, 
-  HeartIcon, 
-  MessageSquareIcon, 
-  RefreshCwIcon, 
-  ShareIcon, 
-  ThumbsDownIcon, 
-  ThumbsUpIcon, 
-  TrashIcon 
+import {
+  CopyIcon,
+  RefreshCwIcon,
+  ShareIcon,
+  ThumbsDownIcon,
+  ThumbsUpIcon,
+  TrashIcon,
 } from 'lucide-react';
+import type { ComponentProps, HTMLAttributes, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 export type AIMessageProps = HTMLAttributes<HTMLDivElement> & {
@@ -42,7 +40,7 @@ export const AIMessageContent = ({
 }: AIMessageContentProps) => (
   <div
     className={cn(
-      'flex flex-col gap-2 rounded-lg px-4 py-3 text-sm relative',
+      'relative flex flex-col gap-2 rounded-lg px-4 py-3 text-sm',
       'bg-muted text-foreground',
       'group-[.is-user]:bg-primary group-[.is-user]:text-primary-foreground',
       className
@@ -71,9 +69,9 @@ export const AIMessageAvatar = ({
 );
 
 // Action Types
-export type AIMessageActionType = 
+export type AIMessageActionType =
   | 'copy'
-  | 'like' 
+  | 'like'
   | 'dislike'
   | 'retry'
   | 'delete'
@@ -99,7 +97,10 @@ export type AIMessageActionsProps = HTMLAttributes<HTMLDivElement> & {
 };
 
 // Built-in action configurations
-const defaultActionConfigs: Record<Exclude<AIMessageActionType, 'custom'>, Omit<AIMessageActionConfig, 'type'>> = {
+const defaultActionConfigs: Record<
+  Exclude<AIMessageActionType, 'custom'>,
+  Omit<AIMessageActionConfig, 'type'>
+> = {
   copy: {
     icon: <CopyIcon />,
     label: 'Copy message',
@@ -107,35 +108,35 @@ const defaultActionConfigs: Record<Exclude<AIMessageActionType, 'custom'>, Omit<
       if (message && navigator.clipboard) {
         await navigator.clipboard.writeText(message);
       }
-    }
+    },
   },
   like: {
     icon: <ThumbsUpIcon />,
     label: 'Like message',
     handler: () => {
       // Default implementation - can be overridden
-    }
+    },
   },
   dislike: {
     icon: <ThumbsDownIcon />,
     label: 'Dislike message',
     handler: () => {
       // Default implementation - can be overridden
-    }
+    },
   },
   retry: {
     icon: <RefreshCwIcon />,
     label: 'Retry generation',
     handler: () => {
       // Default implementation - can be overridden
-    }
+    },
   },
   delete: {
     icon: <TrashIcon />,
     label: 'Delete message',
     handler: () => {
       // Default implementation - can be overridden
-    }
+    },
   },
   share: {
     icon: <ShareIcon />,
@@ -146,8 +147,8 @@ const defaultActionConfigs: Record<Exclude<AIMessageActionType, 'custom'>, Omit<
           text: message,
         });
       }
-    }
-  }
+    },
+  },
 };
 
 export type AIMessageActionProps = HTMLAttributes<HTMLButtonElement> & {
@@ -155,15 +156,16 @@ export type AIMessageActionProps = HTMLAttributes<HTMLButtonElement> & {
   message?: string;
 };
 
-export const AIMessageAction = ({ 
-  config, 
-  message, 
-  className, 
-  ...props 
+export const AIMessageAction = ({
+  config,
+  message,
+  className,
+  ...props
 }: AIMessageActionProps) => {
-  const actionConfig = config.type !== 'custom' 
-    ? { ...defaultActionConfigs[config.type], ...config }
-    : config;
+  const actionConfig =
+    config.type !== 'custom'
+      ? { ...defaultActionConfigs[config.type], ...config }
+      : config;
 
   const handleClick = async () => {
     if (actionConfig.handler) {
@@ -173,15 +175,15 @@ export const AIMessageAction = ({
 
   return (
     <Button
-      variant="ghost"
-      size="icon"
       className={cn(
-        'size-8 opacity-70 hover:opacity-100 transition-opacity',
+        'size-8 opacity-70 transition-opacity hover:opacity-100',
         className
       )}
-      onClick={handleClick}
       disabled={config.disabled}
+      onClick={handleClick}
+      size="icon"
       title={actionConfig.label}
+      variant="ghost"
       {...props}
     >
       {actionConfig.icon}
@@ -210,15 +212,15 @@ export const AIMessageActions = ({
         display === 'hover' && 'opacity-0 group-hover:opacity-100',
         display === 'always' && 'opacity-100',
         // Alignment styles
-        align === 'right' ? 'justify-end ml-auto' : 'justify-start mr-auto',
+        align === 'right' ? 'ml-auto justify-end' : 'mr-auto justify-start',
         className
       )}
       {...props}
     >
       {actions.map((action, index) => (
         <AIMessageAction
-          key={`${action.type}-${index}`}
           config={action}
+          key={`${action.type}-${index}`}
           message={message}
         />
       ))}
