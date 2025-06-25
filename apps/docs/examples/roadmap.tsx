@@ -28,6 +28,7 @@ import {
   getDependentFeatures,
   getBlockingFeatures,
   validateDependencies,
+  getDependencySummary,
 } from '@repo/gantt';
 import {
   KanbanBoard,
@@ -124,44 +125,114 @@ const exampleReleases = Array.from({ length: 3 })
   }));
 
 const exampleFeatures = (() => {
-  // First, create features without dependencies
-  const baseFeatures = Array.from({ length: 20 })
+  // Create specific features with realistic dependencies for a software project
+  const baseFeatures = [
+    {
+      id: 'user-auth',
+      name: 'User Authentication System',
+      startAt: new Date(2024, 0, 1),
+      endAt: new Date(2024, 0, 15),
+      status: statuses[2], // Complete
+      owner: users[0],
+      group: exampleGroups[0],
+      product: exampleProducts[0],
+      initiative: exampleInitiatives[0],
+      release: exampleReleases[0],
+    },
+    {
+      id: 'user-profiles',
+      name: 'User Profile Management',
+      startAt: new Date(2024, 0, 16),
+      endAt: new Date(2024, 1, 5),
+      status: statuses[1], // In Progress
+      owner: users[1],
+      group: exampleGroups[0],
+      product: exampleProducts[0],
+      initiative: exampleInitiatives[0],
+      release: exampleReleases[0],
+      dependencies: ['user-auth'], // Depends on authentication
+    },
+    {
+      id: 'dashboard',
+      name: 'User Dashboard',
+      startAt: new Date(2024, 1, 6),
+      endAt: new Date(2024, 1, 28),
+      status: statuses[0], // Planned
+      owner: users[2],
+      group: exampleGroups[0],
+      product: exampleProducts[0],
+      initiative: exampleInitiatives[0],
+      release: exampleReleases[0],
+      dependencies: ['user-auth', 'user-profiles'], // Depends on both auth and profiles
+    },
+    {
+      id: 'api-endpoints',
+      name: 'REST API Development',
+      startAt: new Date(2024, 0, 8),
+      endAt: new Date(2024, 1, 20),
+      status: statuses[1], // In Progress
+      owner: users[3],
+      group: exampleGroups[1],
+      product: exampleProducts[0],
+      initiative: exampleInitiatives[0],
+      release: exampleReleases[0],
+      dependencies: ['user-auth'], // API needs auth
+    },
+    {
+      id: 'mobile-app',
+      name: 'Mobile Application',
+      startAt: new Date(2024, 1, 21),
+      endAt: new Date(2024, 3, 15),
+      status: statuses[0], // Planned
+      owner: users[4],
+      group: exampleGroups[1],
+      product: exampleProducts[1],
+      initiative: exampleInitiatives[1],
+      release: exampleReleases[1],
+      dependencies: ['api-endpoints'], // Mobile app needs API
+    },
+    {
+      id: 'notifications',
+      name: 'Push Notifications',
+      startAt: new Date(2024, 2, 1),
+      endAt: new Date(2024, 2, 20),
+      status: statuses[0], // Planned
+      owner: users[0],
+      group: exampleGroups[0],
+      product: exampleProducts[0],
+      initiative: exampleInitiatives[0],
+      release: exampleReleases[0],
+      dependencies: ['user-profiles'], // Notifications need user profiles
+    },
+  ];
+
+  // Add some additional random features to fill out the timeline
+  const additionalFeatures = Array.from({ length: 14 })
     .fill(null)
-    .map(() => ({
-      id: faker.string.uuid(),
-      name: capitalize(faker.company.buzzPhrase()),
-      startAt: faker.date.past({ years: 0.5, refDate: new Date() }),
-      endAt: faker.date.future({ years: 0.5, refDate: new Date() }),
-      status: faker.helpers.arrayElement(statuses),
-      owner: faker.helpers.arrayElement(users),
-      group: faker.helpers.arrayElement(exampleGroups),
-      product: faker.helpers.arrayElement(exampleProducts),
-      initiative: faker.helpers.arrayElement(exampleInitiatives),
-      release: faker.helpers.arrayElement(exampleReleases),
-    }));
+    .map(() => {
+      const feature = {
+        id: faker.string.uuid(),
+        name: capitalize(faker.company.buzzPhrase()),
+        startAt: faker.date.past({ years: 0.5, refDate: new Date() }),
+        endAt: faker.date.future({ years: 0.5, refDate: new Date() }),
+        status: faker.helpers.arrayElement(statuses),
+        owner: faker.helpers.arrayElement(users),
+        group: faker.helpers.arrayElement(exampleGroups),
+        product: faker.helpers.arrayElement(exampleProducts),
+        initiative: faker.helpers.arrayElement(exampleInitiatives),
+        release: faker.helpers.arrayElement(exampleReleases),
+      };
 
-  // Add some realistic dependencies to demonstrate the feature
-  const featuresWithDependencies = baseFeatures.map((feature, index) => {
-    let dependencies: string[] | undefined;
-    
-    // Add dependencies to some features (not all)
-    if (index > 0 && Math.random() < 0.3) {
-      // 30% chance of having dependencies
-      const numDeps = Math.random() < 0.7 ? 1 : 2; // Usually 1 dependency, sometimes 2
-      const possibleDeps = baseFeatures.slice(0, index); // Can only depend on earlier features
-      dependencies = faker.helpers.arrayElements(
-        possibleDeps.map(f => f.id),
-        numDeps
-      );
-    }
+      // Some random features might also have dependencies
+      if (Math.random() < 0.2) {
+        const possibleDeps = baseFeatures.slice(0, 3); // Can depend on main features
+        feature.dependencies = [faker.helpers.arrayElement(possibleDeps).id];
+      }
 
-    return {
-      ...feature,
-      dependencies,
-    };
-  });
+      return feature;
+    });
 
-  return featuresWithDependencies;
+  return [...baseFeatures, ...additionalFeatures];
 })();
 
 const exampleMarkers = Array.from({ length: 6 })
@@ -209,13 +280,27 @@ const GanttView = () => {
       return;
     }
 
-    setFeatures((prev) =>
-      prev.map((feature) =>
+    setFeatures((prev) => {
+      const updatedFeatures = prev.map((feature) =>
         feature.id === id ? { ...feature, startAt, endAt } : feature
-      )
-    );
+      );
+      
+      // Validate dependencies after the move
+      const movedFeature = updatedFeatures.find(f => f.id === id);
+      if (movedFeature) {
+        const validation = validateDependencies(movedFeature, updatedFeatures);
+        if (!validation.isValid) {
+          console.warn(`⚠️ Moving "${movedFeature.name}" created dependency conflicts:`);
+          validation.conflicts.forEach(conflict => {
+            console.warn(`  • ${conflict}`);
+          });
+        }
+      }
+      
+      return updatedFeatures;
+    });
 
-    console.log(`Move feature: ${id} from ${startAt} to ${endAt}`);
+    console.log(`📅 Moved feature: ${id} from ${startAt.toLocaleDateString()} to ${endAt.toLocaleDateString()}`);
   };
 
   const handleAddFeature = (date: Date) =>
@@ -229,18 +314,66 @@ const GanttView = () => {
     const blocking = getBlockingFeatures(feature, features);
     const validation = validateDependencies(feature, features);
     
-    console.log(`Dependencies for "${feature.name}":`);
-    console.log(`  Depends on: ${dependencies.map(f => f.name).join(', ') || 'None'}`);
-    console.log(`  Blocking: ${blocking.map(f => f.name).join(', ') || 'None'}`);
+    console.group(`🔗 Dependencies for "${feature.name}"`);
+    
+    if (dependencies.length > 0) {
+      console.log(`📋 Depends on (${dependencies.length}):`);
+      dependencies.forEach(dep => {
+        console.log(`  • ${dep.name} (${dep.status.name})`);
+      });
+    } else {
+      console.log('📋 No dependencies');
+    }
+    
+    if (blocking.length > 0) {
+      console.log(`🚧 Blocking (${blocking.length}):`);
+      blocking.forEach(blocked => {
+        console.log(`  • ${blocked.name} (${blocked.status.name})`);
+      });
+    } else {
+      console.log('🚧 Not blocking any features');
+    }
     
     if (!validation.isValid) {
-      console.log(`  Conflicts: ${validation.conflicts.join('; ')}`);
+      console.warn('⚠️ Dependency conflicts:');
+      validation.conflicts.forEach(conflict => {
+        console.warn(`  • ${conflict}`);
+      });
+    } else {
+      console.log('✅ Dependencies are valid');
     }
+    
+    console.groupEnd();
   };
 
   const handleAddDependency = (id: string) => {
-    console.log(`Add dependency to feature: ${id}`);
+    console.log(`🔗 Add dependency to feature: ${id}`);
     // In a real app, this would open a dialog to select dependencies
+    
+    // For demo purposes, show a summary of all dependencies
+    const summary = getDependencySummary(features);
+    console.group('📊 Dependency Summary');
+    console.log(`📋 Total features: ${summary.totalFeatures}`);
+    console.log(`🔗 Features with dependencies: ${summary.featuresWithDependencies}`);
+    console.log(`📈 Total dependencies: ${summary.totalDependencies}`);
+    
+    if (summary.conflicts.length > 0) {
+      console.warn(`⚠️ Conflicts found in ${summary.conflicts.length} features:`);
+      summary.conflicts.forEach(({ feature, conflicts }) => {
+        console.warn(`  • ${feature.name}: ${conflicts.join('; ')}`);
+      });
+    } else {
+      console.log('✅ No dependency conflicts');
+    }
+    
+    if (summary.cyclicDependency.hasCycle && summary.cyclicDependency.cycle) {
+      console.warn('🔄 Cyclic dependency detected:');
+      console.warn(`  Cycle: ${summary.cyclicDependency.cycle.join(' → ')}`);
+    } else {
+      console.log('✅ No cyclic dependencies');
+    }
+    
+    console.groupEnd();
   };
 
   return (
@@ -288,6 +421,16 @@ const GanttView = () => {
                                 title={`${feature.dependencies.length} dependencies`}
                               />
                             )}
+                            {(() => {
+                              const validation = validateDependencies(feature, features);
+                              return !validation.isValid && (
+                                <AlertTriangleIcon 
+                                  className="text-destructive shrink-0" 
+                                  size={12} 
+                                  title={`Dependency conflicts: ${validation.conflicts.join('; ')}`}
+                                />
+                              );
+                            })()}
                             <p className="flex-1 truncate text-xs">
                               {feature.name}
                             </p>

@@ -369,6 +369,40 @@ export const hasCyclicDependency = (
   return { hasCycle: false };
 };
 
+export const getDependencySummary = (
+  features: GanttFeature[]
+): {
+  totalFeatures: number;
+  featuresWithDependencies: number;
+  totalDependencies: number;
+  conflicts: Array<{ feature: GanttFeature; conflicts: string[] }>;
+  cyclicDependency: { hasCycle: boolean; cycle?: string[] };
+} => {
+  const featuresWithDeps = features.filter(f => f.dependencies?.length);
+  const totalDeps = featuresWithDeps.reduce((sum, f) => sum + (f.dependencies?.length || 0), 0);
+  
+  const conflicts = features
+    .map(feature => ({
+      feature,
+      validation: validateDependencies(feature, features)
+    }))
+    .filter(({ validation }) => !validation.isValid)
+    .map(({ feature, validation }) => ({
+      feature,
+      conflicts: validation.conflicts
+    }));
+  
+  const cyclicDependency = hasCyclicDependency(features);
+  
+  return {
+    totalFeatures: features.length,
+    featuresWithDependencies: featuresWithDeps.length,
+    totalDependencies: totalDeps,
+    conflicts,
+    cyclicDependency
+  };
+};
+
 const GanttContext = createContext<GanttContextProps>({
   zoom: 100,
   range: 'monthly',
