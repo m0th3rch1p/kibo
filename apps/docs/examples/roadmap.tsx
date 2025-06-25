@@ -25,6 +25,9 @@ import {
   GanttSidebarItem,
   GanttTimeline,
   GanttToday,
+  getDependentFeatures,
+  getBlockingFeatures,
+  validateDependencies,
 } from '@repo/gantt';
 import {
   KanbanBoard,
@@ -63,6 +66,8 @@ import {
   ListIcon,
   TableIcon,
   TrashIcon,
+  GitBranchIcon,
+  AlertTriangleIcon,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -118,20 +123,46 @@ const exampleReleases = Array.from({ length: 3 })
     name: capitalize(faker.company.buzzPhrase()),
   }));
 
-const exampleFeatures = Array.from({ length: 20 })
-  .fill(null)
-  .map(() => ({
-    id: faker.string.uuid(),
-    name: capitalize(faker.company.buzzPhrase()),
-    startAt: faker.date.past({ years: 0.5, refDate: new Date() }),
-    endAt: faker.date.future({ years: 0.5, refDate: new Date() }),
-    status: faker.helpers.arrayElement(statuses),
-    owner: faker.helpers.arrayElement(users),
-    group: faker.helpers.arrayElement(exampleGroups),
-    product: faker.helpers.arrayElement(exampleProducts),
-    initiative: faker.helpers.arrayElement(exampleInitiatives),
-    release: faker.helpers.arrayElement(exampleReleases),
-  }));
+const exampleFeatures = (() => {
+  // First, create features without dependencies
+  const baseFeatures = Array.from({ length: 20 })
+    .fill(null)
+    .map(() => ({
+      id: faker.string.uuid(),
+      name: capitalize(faker.company.buzzPhrase()),
+      startAt: faker.date.past({ years: 0.5, refDate: new Date() }),
+      endAt: faker.date.future({ years: 0.5, refDate: new Date() }),
+      status: faker.helpers.arrayElement(statuses),
+      owner: faker.helpers.arrayElement(users),
+      group: faker.helpers.arrayElement(exampleGroups),
+      product: faker.helpers.arrayElement(exampleProducts),
+      initiative: faker.helpers.arrayElement(exampleInitiatives),
+      release: faker.helpers.arrayElement(exampleReleases),
+    }));
+
+  // Add some realistic dependencies to demonstrate the feature
+  const featuresWithDependencies = baseFeatures.map((feature, index) => {
+    let dependencies: string[] | undefined;
+    
+    // Add dependencies to some features (not all)
+    if (index > 0 && Math.random() < 0.3) {
+      // 30% chance of having dependencies
+      const numDeps = Math.random() < 0.7 ? 1 : 2; // Usually 1 dependency, sometimes 2
+      const possibleDeps = baseFeatures.slice(0, index); // Can only depend on earlier features
+      dependencies = faker.helpers.arrayElements(
+        possibleDeps.map(f => f.id),
+        numDeps
+      );
+    }
+
+    return {
+      ...feature,
+      dependencies,
+    };
+  });
+
+  return featuresWithDependencies;
+})();
 
 const exampleMarkers = Array.from({ length: 6 })
   .fill(null)
@@ -190,6 +221,28 @@ const GanttView = () => {
   const handleAddFeature = (date: Date) =>
     console.log(`Add feature: ${date.toISOString()}`);
 
+  const handleViewDependencies = (id: string) => {
+    const feature = features.find(f => f.id === id);
+    if (!feature) return;
+    
+    const dependencies = getDependentFeatures(feature, features);
+    const blocking = getBlockingFeatures(feature, features);
+    const validation = validateDependencies(feature, features);
+    
+    console.log(`Dependencies for "${feature.name}":`);
+    console.log(`  Depends on: ${dependencies.map(f => f.name).join(', ') || 'None'}`);
+    console.log(`  Blocking: ${blocking.map(f => f.name).join(', ') || 'None'}`);
+    
+    if (!validation.isValid) {
+      console.log(`  Conflicts: ${validation.conflicts.join('; ')}`);
+    }
+  };
+
+  const handleAddDependency = (id: string) => {
+    console.log(`Add dependency to feature: ${id}`);
+    // In a real app, this would open a dialog to select dependencies
+  };
+
   return (
     <GanttProvider
       className="rounded-none"
@@ -227,9 +280,18 @@ const GanttView = () => {
                           onMove={handleMoveFeature}
                           {...feature}
                         >
-                          <p className="flex-1 truncate text-xs">
-                            {feature.name}
-                          </p>
+                          <div className="flex items-center gap-1 flex-1">
+                            {feature.dependencies?.length && (
+                              <GitBranchIcon 
+                                className="text-muted-foreground shrink-0" 
+                                size={12} 
+                                title={`${feature.dependencies.length} dependencies`}
+                              />
+                            )}
+                            <p className="flex-1 truncate text-xs">
+                              {feature.name}
+                            </p>
+                          </div>
                           {feature.owner && (
                             <Avatar className="h-4 w-4">
                               <AvatarImage src={feature.owner.image} />
@@ -248,6 +310,20 @@ const GanttView = () => {
                       >
                         <EyeIcon className="text-muted-foreground" size={16} />
                         View feature
+                      </ContextMenuItem>
+                      <ContextMenuItem
+                        className="flex items-center gap-2"
+                        onClick={() => handleViewDependencies(feature.id)}
+                      >
+                        <GitBranchIcon className="text-muted-foreground" size={16} />
+                        View dependencies
+                      </ContextMenuItem>
+                      <ContextMenuItem
+                        className="flex items-center gap-2"
+                        onClick={() => handleAddDependency(feature.id)}
+                      >
+                        <GitBranchIcon className="text-muted-foreground" size={16} />
+                        Add dependency
                       </ContextMenuItem>
                       <ContextMenuItem
                         className="flex items-center gap-2"
