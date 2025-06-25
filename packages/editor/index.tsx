@@ -761,15 +761,15 @@ export const EditorBubbleMenu = ({
   >
     {children && Array.isArray(children)
       ? children.reduce((acc: ReactNode[], child, index) => {
-        if (index === 0) {
-          return [child];
-        }
+          if (index === 0) {
+            return [child];
+          }
 
-        // biome-ignore lint/suspicious/noArrayIndexKey: "only iterator we have"
-        acc.push(<Separator key={index} orientation="vertical" />);
-        acc.push(child);
-        return acc;
-      }, [])
+          // biome-ignore lint/suspicious/noArrayIndexKey: "only iterator we have"
+          acc.push(<Separator key={index} orientation="vertical" />);
+          acc.push(child);
+          return acc;
+        }, [])
       : children}
   </BubbleMenu>
 );

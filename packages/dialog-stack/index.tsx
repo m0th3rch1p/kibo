@@ -34,11 +34,11 @@ type DialogStackContextType = {
 
 const DialogStackContext = createContext<DialogStackContextType>({
   activeIndex: 0,
-  setActiveIndex: () => { },
+  setActiveIndex: () => {},
   totalDialogs: 0,
-  setTotalDialogs: () => { },
+  setTotalDialogs: () => {},
   isOpen: false,
-  setIsOpen: () => { },
+  setIsOpen: () => {},
   clickable: false,
 });
 
@@ -81,7 +81,7 @@ export const DialogStack = ({
         activeIndex,
         setActiveIndex,
         totalDialogs: 0,
-        setTotalDialogs: () => { },
+        setTotalDialogs: () => {},
         isOpen: isOpen ?? false,
         setIsOpen: (value) => setIsOpen(Boolean(value)),
         clickable,
@@ -188,8 +188,8 @@ export const DialogStackOverlay = ({
 
 export type DialogStackBodyProps = HTMLAttributes<HTMLDivElement> & {
   children:
-  | ReactElement<DialogStackChildProps>[]
-  | ReactElement<DialogStackChildProps>;
+    | ReactElement<DialogStackChildProps>[]
+    | ReactElement<DialogStackChildProps>;
 };
 
 export const DialogStackBody = ({
@@ -305,7 +305,7 @@ export const DialogStackContent = ({
         className={cn(
           'h-full w-full transition-all duration-300',
           context.activeIndex !== index &&
-          'pointer-events-none select-none opacity-0'
+            'pointer-events-none select-none opacity-0'
         )}
       >
         {children}
