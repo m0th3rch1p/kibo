@@ -595,6 +595,7 @@ export const GanttAddFeatureHelper: FC<GanttAddFeatureHelperProps> = ({
     <div
       className={cn('absolute top-1/2 w-full px-0.5 -translate-y-1/2', className)}
       ref={mouseRef}
+      style={{ height: `${gantt.rowHeight}px` }}
     >
       <button
         className="flex h-full w-full items-center justify-center rounded-md border border-dashed p-2"
