@@ -59,6 +59,27 @@ const exampleGroups = Array.from({ length: 3 })
     name: capitalize(faker.company.buzzPhrase()),
   }));
 
+const exampleProducts = Array.from({ length: 2 })
+  .fill(null)
+  .map(() => ({
+    id: faker.string.uuid(),
+    name: capitalize(faker.company.buzzPhrase()),
+  }));
+
+const exampleInitiatives = Array.from({ length: 2 })
+  .fill(null)
+  .map(() => ({
+    id: faker.string.uuid(),
+    name: capitalize(faker.company.buzzPhrase()),
+  }));
+
+const exampleReleases = Array.from({ length: 2 })
+  .fill(null)
+  .map(() => ({
+    id: faker.string.uuid(),
+    name: capitalize(faker.company.buzzPhrase()),
+  }));
+
 // Create features with realistic dependencies for a software project
 const featuresWithDependencies = [
   {
@@ -69,6 +90,9 @@ const featuresWithDependencies = [
     status: statuses[2], // Done
     owner: users[0],
     group: exampleGroups[0],
+    product: exampleProducts[0],
+    initiative: exampleInitiatives[0],
+    release: exampleReleases[0],
     // No dependencies - this is foundational
   },
   {
@@ -79,6 +103,9 @@ const featuresWithDependencies = [
     status: statuses[2], // Done
     owner: users[1],
     group: exampleGroups[0],
+    product: exampleProducts[0],
+    initiative: exampleInitiatives[0],
+    release: exampleReleases[0],
     dependencies: ['database-setup'], // Depends on database
   },
   {
@@ -89,6 +116,9 @@ const featuresWithDependencies = [
     status: statuses[1], // In Progress
     owner: users[2],
     group: exampleGroups[0],
+    product: exampleProducts[0],
+    initiative: exampleInitiatives[0],
+    release: exampleReleases[0],
     dependencies: ['user-auth'], // Depends on authentication
   },
   {
@@ -99,6 +129,9 @@ const featuresWithDependencies = [
     status: statuses[1], // In Progress
     owner: users[3],
     group: exampleGroups[1],
+    product: exampleProducts[1],
+    initiative: exampleInitiatives[1],
+    release: exampleReleases[1],
     dependencies: ['database-setup', 'user-auth'], // Depends on both
   },
   {
@@ -109,6 +142,9 @@ const featuresWithDependencies = [
     status: statuses[0], // Planned
     owner: users[0],
     group: exampleGroups[0],
+    product: exampleProducts[0],
+    initiative: exampleInitiatives[0],
+    release: exampleReleases[0],
     dependencies: ['user-profiles', 'api-endpoints'], // Depends on profiles and API
   },
   {
@@ -119,6 +155,9 @@ const featuresWithDependencies = [
     status: statuses[0], // Planned
     owner: users[1],
     group: exampleGroups[1],
+    product: exampleProducts[1],
+    initiative: exampleInitiatives[1],
+    release: exampleReleases[1],
     dependencies: ['api-endpoints'], // Depends on API
   },
   {
@@ -129,6 +168,9 @@ const featuresWithDependencies = [
     status: statuses[0], // Planned
     owner: users[2],
     group: exampleGroups[2],
+    product: exampleProducts[0],
+    initiative: exampleInitiatives[0],
+    release: exampleReleases[0],
     dependencies: ['user-profiles'], // Depends on user profiles
   },
   {
@@ -139,6 +181,9 @@ const featuresWithDependencies = [
     status: statuses[0], // Planned
     owner: users[3],
     group: exampleGroups[2],
+    product: exampleProducts[1],
+    initiative: exampleInitiatives[1],
+    release: exampleReleases[1],
     dependencies: ['dashboard', 'api-endpoints'], // Depends on both dashboard and API
   },
 ];
