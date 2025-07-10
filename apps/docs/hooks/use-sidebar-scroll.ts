@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
+import { useCallback, useEffect, useRef } from 'react';
 
 const SIDEBAR_SCROLL_KEY = 'kibo-sidebar-scroll-position';
 
@@ -26,7 +26,7 @@ export function useSidebarScroll() {
       const savedPosition = sessionStorage.getItem(SIDEBAR_SCROLL_KEY);
       if (savedPosition) {
         isRestoringRef.current = true;
-        element.scrollTop = parseInt(savedPosition, 10);
+        element.scrollTop = Number.parseInt(savedPosition, 10);
         // Reset flag after a short delay to allow for smooth scrolling
         setTimeout(() => {
           isRestoringRef.current = false;

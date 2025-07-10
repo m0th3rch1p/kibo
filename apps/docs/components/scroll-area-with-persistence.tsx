@@ -1,10 +1,11 @@
 'use client';
 
-import { forwardRef } from 'react';
 import { ScrollArea } from '@repo/shadcn-ui/components/ui/scroll-area';
+import { forwardRef } from 'react';
 import { useSidebarScroll } from '../hooks/use-sidebar-scroll';
 
-interface ScrollAreaWithPersistenceProps extends React.ComponentProps<typeof ScrollArea> {
+interface ScrollAreaWithPersistenceProps
+  extends React.ComponentProps<typeof ScrollArea> {
   children: React.ReactNode;
 }
 
@@ -17,8 +18,8 @@ const ScrollAreaWithPersistence = forwardRef<
   return (
     <ScrollArea {...props} ref={ref}>
       <div
-        ref={scrollElementRef}
         className="h-full"
+        ref={scrollElementRef}
         style={{ height: '100%', overflow: 'auto' }}
       >
         {children}
