@@ -54,7 +54,7 @@ const icons = [
 export const Hero = () => (
   <section className='relative isolate overflow-hidden rounded-4xl bg-background pt-8 sm:pt-12 md:pt-16 lg:pt-24' style={{
     backgroundColor: 'var(--background)',
-    backgroundImage: 'radial-gradient(at 81% 100%, hsla(340, 64%, 76%, 1) 0px, transparent 50%), radial-gradient(at 19% 100%, hsla(252, 100%, 76%, 1) 0px, transparent 50%)',
+    backgroundImage: 'radial-gradient(at 81% 100%, var(--color-pink-300) 0px, transparent 50%), radial-gradient(at 19% 100%, var(--color-purple-300) 0px, transparent 50%)',
   }}>
     <div className="pointer-events-none absolute right-0 bottom-0 left-0 select-none border-background/15 border-t">
       <div className="grid grid-cols-24 divide-x divide-y divide-background/15">
