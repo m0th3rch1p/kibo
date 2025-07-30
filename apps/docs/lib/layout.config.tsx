@@ -22,7 +22,7 @@ export const baseOptions: BaseLayoutProps = {
   githubUrl: 'https://github.com/haydenbleasel/kibo',
   nav: {
     title: (
-      <Button size="icon" variant="ghost">
+      <div className="flex items-center gap-2">
         <svg
           className="h-[18px] w-auto"
           fill="none"
@@ -38,7 +38,8 @@ export const baseOptions: BaseLayoutProps = {
             />
           </g>
         </svg>
-      </Button>
+        <span className="font-semibold text-lg">Kibo UI</span>
+      </div>
     ),
   },
 };
