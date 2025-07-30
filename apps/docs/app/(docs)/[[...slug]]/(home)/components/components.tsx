@@ -149,9 +149,9 @@ const ExampleCard = ({
   const Icon =
     icon && icon in icons
       ? (props: LucideProps) =>
-          createElement(icons[icon as keyof typeof icons], {
-            ...props,
-          })
+        createElement(icons[icon as keyof typeof icons], {
+          ...props,
+        })
       : null;
 
   return (
@@ -179,7 +179,7 @@ const ExampleCard = ({
 };
 
 export const Components = () => (
-  <>
+  <div className="container mx-auto">
     <div className="flex w-full flex-col items-start justify-between gap-4 py-16 md:flex-row">
       <div className="grid gap-4">
         <h2 className="max-w-lg font-semibold text-3xl">
@@ -202,5 +202,5 @@ export const Components = () => (
         <ExampleCard key={example.name} {...example} />
       ))}
     </div>
-  </>
+  </div>
 );
