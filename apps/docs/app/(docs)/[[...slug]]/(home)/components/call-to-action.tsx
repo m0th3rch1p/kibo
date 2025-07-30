@@ -24,8 +24,8 @@ const Terminal = () => (
     {/* Terminal Content */}
     <div className="h-[10rem] bg-background p-6 sm:h-[20rem]">
       <div className="flex items-center font-mono text-base">
-        <code className="mr-2 text-primary">$</code>
-        <code>npx kibo-ui add&nbsp;</code>
+        <code className="mr-2 text-blue-600 dark:text-blue-400">$</code>
+        <code className="text-muted-foreground">npx kibo-ui add&nbsp;</code>
         <TextLoop>
           {components.map((component) => (
             <span className="text-accent-foreground" key={component}>
@@ -49,6 +49,8 @@ export const CallToAction = () => (
         Install your first component in seconds with the Kibo UI or shadcn CLI.
       </p>
     </div>
-    <Terminal />
+    <div className="dark">
+      <Terminal />
+    </div>
   </div>
 );
