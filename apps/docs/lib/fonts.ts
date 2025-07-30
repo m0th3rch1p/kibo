@@ -1,9 +1,16 @@
-import { cn } from '@repo/shadcn-ui/lib/utils';
-import { GeistMono } from 'geist/font/mono';
-import { GeistSans } from 'geist/font/sans';
+import {
+  Geist_Mono as createMono,
+  Geist as createSans,
+} from 'next/font/google';
 
-export const fonts = cn(
-  'touch-manipulation font-sans antialiased',
-  GeistSans.variable,
-  GeistMono.variable
-);
+export const sans = createSans({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  weight: ['400', '500', '600', '700'],
+});
+
+export const mono = createMono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  weight: ['400'],
+});
