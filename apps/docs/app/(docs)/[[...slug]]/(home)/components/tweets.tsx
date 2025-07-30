@@ -1,5 +1,8 @@
 import { cn } from '@repo/shadcn-ui/lib/utils';
-import { Tweet } from 'react-tweet';
+import { unstable_cache } from 'next/cache';
+import { Suspense } from 'react';
+import { EmbeddedTweet, TweetNotFound, TweetSkeleton } from 'react-tweet';
+import { getTweet as _getTweet } from 'react-tweet/api';
 
 const tweets = [
   '1922622720887448039',
@@ -21,6 +24,22 @@ const tweets = [
   '1918003297639911563',
 ];
 
+const getTweet = unstable_cache(
+  async (id: string) => _getTweet(id),
+  ['tweet'],
+  { revalidate: 3600 * 24 }
+);
+
+const Tweet = async ({ id }: { id: string }) => {
+  try {
+    const tweet = await getTweet(id);
+    return tweet ? <EmbeddedTweet tweet={tweet} /> : <TweetNotFound />;
+  } catch (error) {
+    console.error(error);
+    return <TweetNotFound error={error} />;
+  }
+};
+
 export const Tweets = () => (
   <div className="container mx-auto">
     <div className="grid gap-4 lg:grid-cols-3">
@@ -41,7 +60,9 @@ export const Tweets = () => (
         )}
       >
         {tweets.map((tweet) => (
-          <Tweet id={tweet} key={tweet} />
+          <Suspense fallback={<TweetSkeleton />} key={tweet}>
+            <Tweet id={tweet} />
+          </Suspense>
         ))}
       </div>
     </div>
