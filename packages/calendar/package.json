@@ -16,5 +16,21 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "typescript": "^5.8.3"
+  },
+  "kibo": {
+    "poweredBy": [
+      { "name": "dnd kit", "url": "https://dndkit.com/" },
+      { "name": "Jotai", "url": "https://jotai.org/" },
+      { "name": "date-fns", "url": "https://date-fns.org/" },
+      { "name": "Lucide", "url": "https://lucide.dev/" }
+    ],
+    "features": [
+      "Features are grouped by day",
+      "Features are color-coded by their status",
+      "Features are truncated if there are too many to fit in the grid cell",
+      "Selectable date range",
+      "Pagination of dates",
+      "Internationalization through locale prop"
+    ]
   }
 }

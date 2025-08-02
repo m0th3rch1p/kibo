@@ -35,5 +35,34 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "typescript": "^5.8.3"
+  },
+  "kibo": {
+    "poweredBy": [
+      { "name": "Tiptap", "url": "https://tiptap.dev/" },
+      { "name": "Lucide", "url": "https://lucide.dev/" },
+      { "name": "lowlight", "url": "https://github.com/wooorm/lowlight" },
+      { "name": "tippy.js", "url": "https://atomiks.github.io/tippyjs/" },
+      { "name": "Fuse.js", "url": "https://www.fusejs.io/" }
+    ],
+    "features": [
+      "Rich text editing with TipTap",
+      "Slash commands for quick formatting",
+      "Floating menu for common actions",
+      "Bubble menu for text selection",
+      "Text formatting (bold, italic, underline, strikethrough, code, superscript, subscript)",
+      "Text and background colors",
+      "Links",
+      "Clear formatting",
+      "Tables with column/row management",
+      "Merge and split table cells",
+      "Character and word count",
+      "Code blocks with syntax highlighting",
+      "Headings (H1, H2, H3)",
+      "Lists (bullet, ordered, task)",
+      "Blockquotes",
+      "Horizontal rules",
+      "Placeholder text",
+      "Character limit support"
+    ]
   }
 }

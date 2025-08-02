@@ -15,5 +15,15 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "typescript": "^5.8.3"
+  },
+  "kibo": {
+    "poweredBy": [
+      { "name": "Radix UI Portal", "url": "https://www.radix-ui.com/primitives/docs/components/portal" }
+    ],
+    "features": [
+      "Allows for dialogs to be stacked on top of each other",
+      "Provides a consistent layout and styling for each dialog",
+      "Includes navigation components to move between them"
+    ]
   }
 }

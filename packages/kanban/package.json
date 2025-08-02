@@ -17,5 +17,14 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "typescript": "^5.8.3"
+  },
+  "kibo": {
+    "poweredBy": [
+      { "name": "dnd kit", "url": "https://dndkit.com/" }
+    ],
+    "features": [
+      "Drag and drop features between columns",
+      "Customize the card contents"
+    ]
   }
 }

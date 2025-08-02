@@ -14,5 +14,15 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "typescript": "^5.8.3"
+  },
+  "kibo": {
+    "poweredBy": [
+      { "name": "react-fast-marquee", "url": "https://www.react-fast-marquee.com/" },
+      { "name": "useHooks", "url": "https://usehooks.com/" }
+    ],
+    "features": [
+      "Drag and drop items between groups",
+      "Customize the item contents"
+    ]
   }
 }

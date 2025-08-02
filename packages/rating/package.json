@@ -15,5 +15,18 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "typescript": "^5.8.3"
+  },
+  "kibo": {
+    "poweredBy": [
+      { "name": "Lucide", "url": "https://lucide.dev/" }
+    ],
+    "features": [
+      "Customizable number of stars and size",
+      "Support for keyboard navigation",
+      "Hover and focus states",
+      "Accessible ARIA attributes",
+      "Read-only mode",
+      "Hidden input support for forms"
+    ]
   }
 }

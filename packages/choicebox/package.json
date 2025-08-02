@@ -15,5 +15,22 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "typescript": "^5.8.3"
+  },
+  "kibo": {
+    "poweredBy": [
+      { "name": "Lucide", "url": "https://lucide.dev/" }
+    ],
+    "features": [
+      "Card-style radio and checkbox options",
+      "Customizable header, title, and description for each option",
+      "Accessible keyboard navigation",
+      "Visual feedback for selected and hover states",
+      "Support for disabled states",
+      "Customizable styling through className props",
+      "Flexible layout with inline and block options",
+      "Clear visual hierarchy with title and subtitle support",
+      "Consistent styling with the design system",
+      "Support for custom content and indicators"
+    ]
   }
 }

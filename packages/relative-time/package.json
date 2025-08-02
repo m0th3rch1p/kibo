@@ -14,5 +14,15 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "typescript": "^5.8.3"
+  },
+  "kibo": {
+    "features": [
+      "Displays multiple timezones simultaneously",
+      "Supports both controlled and uncontrolled time states",
+      "Auto-updates every second when no time is provided",
+      "Customizable date and time format options",
+      "Clean, minimal UI with timezone labels and formatted times",
+      "Responsive layout with flex positioning"
+    ]
   }
 }

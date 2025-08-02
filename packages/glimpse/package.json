@@ -13,5 +13,19 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "typescript": "^5.8.3"
+  },
+  "kibo": {
+    "features": [
+      "Fetches data from a URL in a React Server Component",
+      "Preview a URL when hovering over a link",
+      "Show title, description, and image",
+      "Customizable hover card appearance",
+      "Smooth transitions for hover state",
+      "Accessible keyboard navigation",
+      "Touch-friendly for mobile devices",
+      "Customizable styling through className props",
+      "Reduced motion support for animations",
+      "Works with any link or element with role=\"link\""
+    ]
   }
 }

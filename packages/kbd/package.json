@@ -14,5 +14,18 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "typescript": "^5.8.3"
+  },
+  "kibo": {
+    "poweredBy": [
+      { "name": "ts-key-enum", "url": "https://www.npmjs.com/package/ts-key-enum" }
+    ],
+    "features": [
+      "Compound component for displaying keyboard shortcuts",
+      "Aria label intellisense for modifier keys",
+      "Customizable separator between keys",
+      "Monospace font styling for consistent key display",
+      "Flexible styling through className props",
+      "Support for both single keys and key combinations"
+    ]
   }
 }

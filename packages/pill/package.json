@@ -14,5 +14,20 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "typescript": "^5.8.3"
+  },
+  "kibo": {
+    "poweredBy": [
+      { "name": "Lucide", "url": "https://lucide.dev/" }
+    ],
+    "features": [
+      "Customizable badge-like component with rounded corners and consistent padding",
+      "Support for avatars with fallback options",
+      "Built-in status indicators with variants (success, error, warning, info) and pulse animation",
+      "Delta indicators for showing changes (increase/decrease)",
+      "Icon support with consistent styling",
+      "Avatar groups with overlapping effect",
+      "Ghost button integration",
+      "Themeable variants"
+    ]
   }
 }

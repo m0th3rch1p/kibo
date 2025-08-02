@@ -13,5 +13,15 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "typescript": "^5.8.3"
+  },
+  "kibo": {
+    "features": [
+      "Customizable cursor color with automatic text color contrast adjustment",
+      "Optional name label display",
+      "Optional message display",
+      "Smooth cursor pointer with tooltip-style appearance",
+      "Fully accessible with ARIA attributes",
+      "Responsive and performant with optimized rendering"
+    ]
   }
 }

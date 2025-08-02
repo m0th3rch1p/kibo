@@ -15,5 +15,18 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "typescript": "^5.8.3"
+  },
+  "kibo": {
+    "poweredBy": [
+      { "name": "Lucide", "url": "https://lucide.dev/" }
+    ],
+    "features": [
+      "Controlled and uncontrolled visibility state",
+      "Customizable close handler",
+      "Optional inset variant with rounded corners",
+      "Composable API with Icon, Title, Action and Close components",
+      "Customizable via className prop",
+      "Adapts to primary color tokens"
+    ]
   }
 }

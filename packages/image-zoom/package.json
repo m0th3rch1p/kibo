@@ -14,5 +14,22 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "typescript": "^5.8.3"
+  },
+  "kibo": {
+    "poweredBy": [
+      { "name": "react-medium-image-zoom", "url": "https://rpearce.github.io/react-medium-image-zoom/" }
+    ],
+    "features": [
+      "Zoom in on images with a click or tap",
+      "Customizable zoom button appearance and position",
+      "Smooth transitions for zooming in and out",
+      "Customizable backdrop with blur effect",
+      "Support for both controlled and uncontrolled zoom states",
+      "Accessible keyboard navigation",
+      "Touch-friendly for mobile devices",
+      "Customizable styling through className props",
+      "Reduced motion support for animations",
+      "Works with any image, SVG, or element with role=\"img\""
+    ]
   }
 }

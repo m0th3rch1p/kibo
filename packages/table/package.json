@@ -16,5 +16,16 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "typescript": "^5.8.3"
+  },
+  "kibo": {
+    "poweredBy": [
+      { "name": "TanStack Table", "url": "https://tanstack.com/table" },
+      { "name": "Lucide", "url": "https://lucide.dev/" },
+      { "name": "Jotai", "url": "https://jotai.org/" }
+    ],
+    "features": [
+      "Customizable columns",
+      "Sortable columns"
+    ]
   }
 }

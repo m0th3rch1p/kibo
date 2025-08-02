@@ -13,5 +13,19 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "typescript": "^5.8.3"
+  },
+  "kibo": {
+    "poweredBy": [
+      { "name": "Radix UI Tabs", "url": "https://www.radix-ui.com/primitives/docs/components/tabs" },
+      { "name": "Lucide", "url": "https://lucide.dev/" }
+    ],
+    "features": [
+      "Copy code to clipboard",
+      "Customize the tab contents",
+      "Multiple tabs support",
+      "Customizable copy button, tab triggers and tab content",
+      "Customizable copy button timeout and callbacks",
+      "Accessible tabs using Radix's Tabs primitive"
+    ]
   }
 }

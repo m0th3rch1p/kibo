@@ -15,5 +15,20 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "typescript": "^5.8.3"
+  },
+  "kibo": {
+    "poweredBy": [
+      { "name": "motion", "url": "https://motion.dev/" },
+      { "name": "Lucide", "url": "https://lucide.dev/" }
+    ],
+    "features": [
+      "Compare two items side by side with a draggable slider",
+      "Support for both hover and drag modes",
+      "Smooth animations",
+      "Touch and mouse event support",
+      "Customizable slider appearance",
+      "Responsive design that works with any content",
+      "Context provider for accessing comparison state"
+    ]
   }
 }

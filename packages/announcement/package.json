@@ -13,5 +13,18 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "typescript": "^5.8.3"
+  },
+  "kibo": {
+    "poweredBy": [
+      { "name": "Lucide", "url": "https://lucide.dev/" }
+    ],
+    "features": [
+      "Compound component with Badge-based styling and rounded full appearance",
+      "Customizable themed mode for different visual styles",
+      "Built-in tag and title components for consistent layout",
+      "Supports hover effects with shadow transitions",
+      "Flexible styling through className props",
+      "Context-based theming that affects child components"
+    ]
   }
 }

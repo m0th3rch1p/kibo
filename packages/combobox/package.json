@@ -15,5 +15,19 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "typescript": "^5.8.3"
+  },
+  "kibo": {
+    "features": [
+      "Autocomplete input with dropdown list of suggestions",
+      "Controlled and uncontrolled modes",
+      "Customizable trigger button",
+      "Search functionality",
+      "Empty state handling",
+      "Responsive width that matches the trigger",
+      "Keyboard navigation support",
+      "Grouping of items",
+      "Context-based type labeling",
+      "Native create new functionality"
+    ]
   }
 }
