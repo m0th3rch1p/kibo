@@ -19,11 +19,38 @@ type PageProps = {
 
 const Page = async (props: PageProps) => {
   const params = await props.params;
-  const page = source.getPage(params.slug);
 
   if (!params.slug) {
     return <Home />;
   }
+
+  if (params.slug.length === 2 && params.slug[0] === 'components') {
+    const component = params.slug[1];
+    const packageJson = await import(`../../../../../packages/${component}/package.json`);
+
+    return (
+      <DocsPage
+        full={true}
+        tableOfContent={{ style: 'clerk' }}
+      >
+        <DocsTitle>{component.charAt(0).toUpperCase() + component.slice(1)}</DocsTitle>
+        <DocsDescription>{packageJson.description}</DocsDescription>
+        <DocsBody>
+          <PoweredBy packages={packageJson.kibo.poweredBy.map((p: { name: string, url: string }) => ({ name: p.name, url: `/components/${p.name}` }))} />
+          <Preview path={component} />
+          <h2>Installation</h2>
+          <Installer packageName={packageJson.name} />
+          <h2>Features</h2>
+          <ul>
+            {packageJson.kibo.features.map((feature: string) => (
+              <li key={feature}>{feature}</li>
+            ))}
+          </ul>
+        </DocsBody>
+      </DocsPage>);
+  }
+
+  const page = source.getPage(params.slug);
 
   if (!page) {
     notFound();
