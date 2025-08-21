@@ -15,7 +15,7 @@ const reels: ReelItem[] = [
     id: 1,
     type: 'video',
     src: '/videos/grok-imagine-1.mp4',
-    duration: 6, // 6 seconds
+    duration: 6,
     title: 'Grok Imagine Demo 1',
     description: 'First demo video',
   },
@@ -23,7 +23,7 @@ const reels: ReelItem[] = [
     id: 2,
     type: 'video',
     src: '/videos/grok-imagine-2.mp4',
-    duration: 6, // 6 seconds
+    duration: 6,
     title: 'Grok Imagine Demo 2',
     description: 'Second demo video',
   },
@@ -31,7 +31,7 @@ const reels: ReelItem[] = [
     id: 3,
     type: 'video',
     src: '/videos/grok-imagine-3.mp4',
-    duration: 6, // 6 seconds
+    duration: 6,
     title: 'Grok Imagine Demo 3',
     description: 'Third demo video',
   },
