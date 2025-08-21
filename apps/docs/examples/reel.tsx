@@ -10,28 +10,40 @@ import {
   ReelVideo,
 } from '@repo/reel';
 
-const reels = [
+const reels: ReelItem[] = [
   {
     id: 1,
-    video: '/videos/grok-imagine-1.mp4',
+    type: 'video',
+    src: '/videos/grok-imagine-1.mp4',
+    duration: 10, // 10 seconds
+    title: 'Grok Imagine Demo 1',
+    description: 'First demo video',
   },
   {
     id: 2,
-    video: '/videos/grok-imagine-2.mp4',
+    type: 'video',
+    src: '/videos/grok-imagine-2.mp4',
+    duration: 15, // 15 seconds
+    title: 'Grok Imagine Demo 2',
+    description: 'Second demo video',
   },
   {
     id: 3,
-    video: '/videos/grok-imagine-3.mp4',
+    type: 'video',
+    src: '/videos/grok-imagine-3.mp4',
+    duration: 12, // 12 seconds
+    title: 'Grok Imagine Demo 3',
+    description: 'Third demo video',
   },
 ];
 
 const Example = () => (
-  <Reel className="w-auto" data={reels}>
+  <Reel data={reels}>
     <ReelProgress />
     <ReelContent>
       {(reel) => (
         <ReelItem key={reel.id}>
-          <ReelVideo src={reel.video} />
+          <ReelVideo src={reel.src} />
         </ReelItem>
       )}
     </ReelContent>

@@ -17,34 +17,36 @@ import {
 // Example data for the reel
 const reelItems: ReelItem[] = [
   {
-    id: 1,
+    id: 'video-1',
     type: 'video',
-    src: 'https://example.com/video1.mp4',
+    src: '/videos/sample-video-1.mp4',
+    duration: 10, // 10 seconds
     title: 'First Video',
     description: 'This is the first video in the reel',
   },
   {
-    id: 2,
+    id: 'image-1',
     type: 'image',
-    src: 'https://example.com/image1.jpg',
+    src: '/images/sample-landscape.jpg',
+    duration: 5, // 5 seconds
     alt: 'Beautiful landscape',
-    duration: 5,
     title: 'Nature Photo',
     description: 'A stunning landscape photograph',
   },
   {
-    id: 3,
+    id: 'video-2',
     type: 'video',
-    src: 'https://example.com/video2.mp4',
+    src: '/videos/sample-video-2.mp4',
+    duration: 15, // 15 seconds
     title: 'Second Video',
     description: 'Another exciting video',
   },
   {
-    id: 4,
+    id: 'image-2',
     type: 'image',
-    src: 'https://example.com/image2.jpg',
+    src: '/images/sample-cityscape.jpg',
+    duration: 7, // 7 seconds
     alt: 'City skyline',
-    duration: 7,
     title: 'Urban Photography',
     description: 'Modern city architecture',
   },

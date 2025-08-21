@@ -31,8 +31,8 @@ export type ReelItem = {
   id: string | number;
   type: 'video' | 'image';
   src: string;
+  duration: number; // Duration in seconds for both video and image
   alt?: string;
-  duration?: number; // For images, in seconds
   title?: string;
   description?: string;
 };
@@ -99,19 +99,19 @@ export const Reel = ({
     prop: controlledIndex,
     onChange: controlledOnIndexChange,
   });
-  
+
   const [isPlaying, setIsPlaying] = useControllableState({
     defaultProp: defaultPlaying ?? autoPlay,
     prop: controlledPlaying,
     onChange: controlledOnPlayingChange,
   });
-  
+
   const [isMuted, setIsMuted] = useControllableState({
     defaultProp: defaultMuted,
     prop: controlledMuted,
     onChange: controlledOnMutedChange,
   });
-  
+
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isNavigating, setIsNavigating] = useState(false);
@@ -147,7 +147,7 @@ export const Reel = ({
     >
       <div
         className={cn(
-          'relative isolate h-full w-full overflow-hidden rounded-xl bg-black',
+          'relative isolate h-full w-auto overflow-hidden rounded-xl bg-black',
           'aspect-[9/16]',
           className
         )}
@@ -159,8 +159,8 @@ export const Reel = ({
   );
 };
 
-export type ReelContentProps = HTMLAttributes<HTMLDivElement> & {
-  children: ((item: ReelItem, index: number) => React.ReactNode) | React.ReactNode;
+export type ReelContentProps = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
+  children: ((item: ReelItem, index: number) => React.ReactNode);
 };
 
 export const ReelContent = ({
@@ -212,17 +212,13 @@ export const ReelItem = ({ className, children, ...props }: ReelItemProps) => (
   </div>
 );
 
-export type ReelVideoProps = VideoHTMLAttributes<HTMLVideoElement> & {
-  onLoadedMetadata?: (duration: number) => void;
-  onTimeUpdate?: (currentTime: number) => void;
-  onEnded?: () => void;
-};
+export type ReelVideoProps = VideoHTMLAttributes<HTMLVideoElement>;
+
+const MS_TO_SECONDS = 1000;
+const PERCENTAGE = 100;
 
 export const ReelVideo = ({
   className,
-  onLoadedMetadata,
-  onTimeUpdate,
-  onEnded,
   ...props
 }: ReelVideoProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -234,112 +230,31 @@ export const ReelVideo = ({
     currentIndex,
     setCurrentIndex,
     data,
+    progress,
+    currentItem,
   } = useReelContext();
-  const [videoDuration, setVideoDuration] = useState(0);
-  const [isVideoReady, setIsVideoReady] = useState(false);
+  const animationFrameRef = useRef<number | undefined>(undefined);
+  const startTimeRef = useRef<number | undefined>(undefined);
+  const pausedProgressRef = useRef<number>(0);
+  const duration = currentItem.duration;
 
+  // Set duration when component mounts or currentIndex changes
+  useEffect(() => {
+    setDuration(duration);
+    setProgress(0);
+    pausedProgressRef.current = 0;
+  }, [currentIndex, duration, setDuration, setProgress]);
+
+  // Handle muting
   useEffect(() => {
     const video = videoRef.current;
     if (!video) {
       return;
     }
-
     video.muted = isMuted;
   }, [isMuted]);
 
-  const handleLoadedMetadata = () => {
-    const video = videoRef.current;
-    if (!video) {
-      return;
-    }
-
-    const duration = video.duration;
-    setVideoDuration(duration);
-    setDuration(duration);
-    setIsVideoReady(true);
-    onLoadedMetadata?.(duration);
-
-    // Start playing after metadata is loaded on initial mount
-    if (isPlaying && currentIndex === 0) {
-      video.play().catch(() => {
-        // Ignore autoplay errors
-      });
-    }
-  };
-
-  const handleTimeUpdate = () => {
-    const video = videoRef.current;
-    if (!(video && videoDuration)) {
-      return;
-    }
-
-    const currentTime = video.currentTime;
-    const PERCENTAGE = 100;
-    const progress = (currentTime / videoDuration) * PERCENTAGE;
-    setProgress(progress);
-    onTimeUpdate?.(currentTime);
-  };
-
-  // Use requestAnimationFrame for smoother progress updates
-  useEffect(() => {
-    if (!(videoRef.current && isVideoReady)) {
-      return;
-    }
-
-    let animationFrameId: number;
-    const PERCENTAGE = 100;
-
-    const updateProgress = () => {
-      const video = videoRef.current;
-      if (video && videoDuration && !video.paused && !video.ended) {
-        const progress = (video.currentTime / videoDuration) * PERCENTAGE;
-        setProgress(progress);
-        animationFrameId = requestAnimationFrame(updateProgress);
-      }
-    };
-
-    // Start animation if video is playing or should be playing
-    if (isPlaying || (videoRef.current && !videoRef.current.paused)) {
-      animationFrameId = requestAnimationFrame(updateProgress);
-    }
-
-    return () => {
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
-      }
-    };
-  }, [isPlaying, videoDuration, setProgress, isVideoReady]); // Added isVideoReady to ensure video is loaded
-
-  const handleEnded = () => {
-    onEnded?.();
-    const totalItems = data?.length || 0;
-
-    if (currentIndex < totalItems - 1) {
-      setCurrentIndex(currentIndex + 1);
-    } else {
-      setCurrentIndex(0);
-    }
-  };
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (video) {
-      video.currentTime = 0;
-      setProgress(0);
-      setIsVideoReady(false); // Reset ready state when changing videos
-      if (isPlaying) {
-        // Small delay to ensure video is ready
-        const PLAY_DELAY = 10;
-        setTimeout(() => {
-          video.play().catch(() => {
-            // Ignore autoplay errors
-          });
-        }, PLAY_DELAY);
-      }
-    }
-  }, [currentIndex, setProgress, isPlaying]); // Only reset when index changes, not when pausing
-
-  // Separate effect for play/pause without resetting
+  // Handle play/pause with duration-based progress
   useEffect(() => {
     const video = videoRef.current;
     if (!video) {
@@ -350,26 +265,63 @@ export const ReelVideo = ({
       video.play().catch(() => {
         // Ignore autoplay errors
       });
+      
+      // Start progress animation
+      const elapsedTime = (pausedProgressRef.current * duration) / PERCENTAGE;
+      startTimeRef.current = performance.now() - elapsedTime * MS_TO_SECONDS;
+
+      const updateProgress = (currentTime: number) => {
+        const elapsed = (currentTime - (startTimeRef.current || 0)) / MS_TO_SECONDS;
+        const newProgress = (elapsed / duration) * PERCENTAGE;
+
+        if (newProgress >= PERCENTAGE) {
+          const totalItems = data?.length || 0;
+          if (currentIndex < totalItems - 1) {
+            setCurrentIndex(currentIndex + 1);
+          } else {
+            setCurrentIndex(0);
+          }
+        } else {
+          setProgress(newProgress);
+          pausedProgressRef.current = newProgress;
+          animationFrameRef.current = requestAnimationFrame(updateProgress);
+        }
+      };
+
+      animationFrameRef.current = requestAnimationFrame(updateProgress);
     } else {
       video.pause();
+      pausedProgressRef.current = progress;
     }
-  }, [isPlaying]);
 
-  const handlePlay = () => {
-    // Force trigger animation when video actually starts playing
-    if (!isVideoReady) {
-      setIsVideoReady(true);
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [
+    isPlaying,
+    duration,
+    currentIndex,
+    setProgress,
+    setCurrentIndex,
+    data,
+    progress,
+  ]);
+
+  // Reset video when index changes
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.currentTime = 0;
     }
-  };
+  }, [currentIndex]);
 
   return (
     <video
       className={cn('absolute inset-0 h-full w-full object-cover', className)}
+      loop
       muted={isMuted}
-      onEnded={handleEnded}
-      onLoadedMetadata={handleLoadedMetadata}
-      onPlay={handlePlay}
-      onTimeUpdate={handleTimeUpdate}
       playsInline
       ref={videoRef}
       {...props}
@@ -385,8 +337,6 @@ export type ReelImageProps = Omit<ComponentProps<'img'>, 'alt'> & {
 };
 
 const DEFAULT_IMAGE_DURATION = 5;
-const MS_TO_SECONDS = 1000;
-const PERCENTAGE = 100;
 
 export const ReelImage = ({
   className,
@@ -405,8 +355,8 @@ export const ReelImage = ({
     data,
     progress,
   } = useReelContext();
-  const animationFrameRef = useRef<number | undefined>();
-  const startTimeRef = useRef<number | undefined>();
+  const animationFrameRef = useRef<number | undefined>(undefined);
+  const startTimeRef = useRef<number | undefined>(undefined);
   const pausedProgressRef = useRef<number>(0);
 
   // Reset progress when index changes
