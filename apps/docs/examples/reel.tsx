@@ -13,27 +13,24 @@ import {
 const reels = [
   {
     id: 1,
-    video:
-      '/videos/grok-imagine-1.mp4',
+    video: '/videos/grok-imagine-1.mp4',
   },
   {
     id: 2,
-    video:
-      '/videos/grok-imagine-2.mp4',
+    video: '/videos/grok-imagine-2.mp4',
   },
   {
     id: 3,
-    video:
-      '/videos/grok-imagine-3.mp4',
+    video: '/videos/grok-imagine-3.mp4',
   },
 ];
 
 const Example = () => (
-  <Reel data={reels} className="w-auto">
+  <Reel className="w-auto" data={reels}>
     <ReelProgress />
     <ReelContent>
       {(reel) => (
-        <ReelItem>
+        <ReelItem key={reel.id}>
           <ReelVideo src={reel.video} />
         </ReelItem>
       )}

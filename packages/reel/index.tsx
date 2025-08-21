@@ -26,7 +26,18 @@ import {
 } from 'react';
 import { cn } from '@/lib/utils';
 
-type ReelContextType<T = unknown> = {
+// Explicit type for reel items
+export type ReelItem = {
+  id: string | number;
+  type: 'video' | 'image';
+  src: string;
+  alt?: string;
+  duration?: number; // For images, in seconds
+  title?: string;
+  description?: string;
+};
+
+type ReelContextType = {
   currentIndex: number;
   setCurrentIndex: (index: number) => void;
   isPlaying: boolean;
@@ -37,13 +48,13 @@ type ReelContextType<T = unknown> = {
   setProgress: (progress: number) => void;
   duration: number;
   setDuration: (duration: number) => void;
-  data: T[];
-  currentItem: T;
+  data: ReelItem[];
+  currentItem: ReelItem;
   isNavigating: boolean;
   setIsNavigating: (navigating: boolean) => void;
 };
 
-const ReelContext = createContext<ReelContextType<unknown> | undefined>(undefined);
+const ReelContext = createContext<ReelContextType | undefined>(undefined);
 
 const useReelContext = () => {
   const context = useContext(ReelContext);
@@ -53,8 +64,8 @@ const useReelContext = () => {
   return context;
 };
 
-export type ReelProps<T = unknown> = HTMLAttributes<HTMLDivElement> & {
-  data: T[];
+export type ReelProps = HTMLAttributes<HTMLDivElement> & {
+  data: ReelItem[];
   defaultIndex?: number;
   index?: number;
   onIndexChange?: (index: number) => void;
@@ -67,7 +78,7 @@ export type ReelProps<T = unknown> = HTMLAttributes<HTMLDivElement> & {
   autoPlay?: boolean;
 };
 
-export const Reel = <T = unknown>({
+export const Reel = ({
   className,
   children,
   data,
@@ -82,7 +93,7 @@ export const Reel = <T = unknown>({
   onMutedChange: controlledOnMutedChange,
   autoPlay = true,
   ...props
-}: ReelProps<T>) => {
+}: ReelProps) => {
   const [currentIndex, setCurrentIndexState] = useControllableState({
     defaultProp: defaultIndex,
     prop: controlledIndex,
@@ -149,7 +160,7 @@ export const Reel = <T = unknown>({
 };
 
 export type ReelContentProps = HTMLAttributes<HTMLDivElement> & {
-  children: ((item: unknown, index: number) => React.ReactNode) | React.ReactNode;
+  children: ((item: ReelItem, index: number) => React.ReactNode) | React.ReactNode;
 };
 
 export const ReelContent = ({
@@ -394,8 +405,8 @@ export const ReelImage = ({
     data,
     progress,
   } = useReelContext();
-  const animationFrameRef = useRef<number>();
-  const startTimeRef = useRef<number>();
+  const animationFrameRef = useRef<number | undefined>();
+  const startTimeRef = useRef<number | undefined>();
   const pausedProgressRef = useRef<number>(0);
 
   // Reset progress when index changes
@@ -466,7 +477,7 @@ export const ReelImage = ({
 
 export type ReelProgressProps = HTMLAttributes<HTMLDivElement> & {
   children?: (
-    item: unknown,
+    item: ReelItem,
     index: number,
     isActive: boolean,
     progress: number
