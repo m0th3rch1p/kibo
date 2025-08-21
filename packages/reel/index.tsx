@@ -1,5 +1,6 @@
 'use client';
 
+import { useControllableState } from '@radix-ui/react-use-controllable-state';
 import {
   ChevronLeft,
   ChevronRight,
@@ -39,6 +40,8 @@ type ReelContextType<T = any> = {
   setDuration: (duration: number) => void;
   data: T[];
   currentItem: T;
+  isNavigating: boolean;
+  setIsNavigating: (navigating: boolean) => void;
 };
 
 const ReelContext = createContext<ReelContextType<any> | undefined>(undefined);
@@ -54,34 +57,61 @@ const useReelContext = () => {
 export type ReelProps<T = any> = HTMLAttributes<HTMLDivElement> & {
   data: T[];
   defaultIndex?: number;
-  autoPlay?: boolean;
-  defaultMuted?: boolean;
+  index?: number;
   onIndexChange?: (index: number) => void;
+  defaultPlaying?: boolean;
+  playing?: boolean;
+  onPlayingChange?: (playing: boolean) => void;
+  defaultMuted?: boolean;
+  muted?: boolean;
+  onMutedChange?: (muted: boolean) => void;
+  autoPlay?: boolean;
 };
 
-export const Reel = <T extends any = any>({
+export const Reel = <T = any>({
   className,
   children,
   data,
   defaultIndex = 0,
-  autoPlay = true,
+  index: controlledIndex,
+  onIndexChange: controlledOnIndexChange,
+  defaultPlaying,
+  playing: controlledPlaying,
+  onPlayingChange: controlledOnPlayingChange,
   defaultMuted = true,
-  onIndexChange,
+  muted: controlledMuted,
+  onMutedChange: controlledOnMutedChange,
+  autoPlay = true,
   ...props
 }: ReelProps<T>) => {
-  const [currentIndex, setCurrentIndexState] = useState(defaultIndex);
-  const [isPlaying, setIsPlaying] = useState(autoPlay);
-  const [isMuted, setIsMuted] = useState(defaultMuted);
+  const [currentIndex, setCurrentIndexState] = useControllableState({
+    defaultProp: defaultIndex,
+    prop: controlledIndex,
+    onChange: controlledOnIndexChange,
+  });
+  
+  const [isPlaying, setIsPlaying] = useControllableState({
+    defaultProp: defaultPlaying ?? autoPlay,
+    prop: controlledPlaying,
+    onChange: controlledOnPlayingChange,
+  });
+  
+  const [isMuted, setIsMuted] = useControllableState({
+    defaultProp: defaultMuted,
+    prop: controlledMuted,
+    onChange: controlledOnMutedChange,
+  });
+  
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const setCurrentIndex = useCallback(
     (index: number) => {
       setCurrentIndexState(index);
       setProgress(0);
-      onIndexChange?.(index);
     },
-    [onIndexChange]
+    [setCurrentIndexState]
   );
 
   const currentItem = data[currentIndex];
@@ -101,6 +131,8 @@ export const Reel = <T extends any = any>({
         setDuration,
         data,
         currentItem,
+        isNavigating,
+        setIsNavigating,
       }}
     >
       <div
@@ -194,6 +226,7 @@ export const ReelVideo = ({
     data,
   } = useReelContext();
   const [videoDuration, setVideoDuration] = useState(0);
+  const [isVideoReady, setIsVideoReady] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -209,7 +242,13 @@ export const ReelVideo = ({
     const duration = video.duration;
     setVideoDuration(duration);
     setDuration(duration);
+    setIsVideoReady(true);
     onLoadedMetadata?.(duration);
+
+    // Start playing after metadata is loaded on initial mount
+    if (isPlaying && currentIndex === 0) {
+      video.play().catch(() => { });
+    }
   };
 
   const handleTimeUpdate = () => {
@@ -224,10 +263,10 @@ export const ReelVideo = ({
 
   // Use requestAnimationFrame for smoother progress updates
   useEffect(() => {
-    if (!isPlaying || !videoRef.current) return;
+    if (!(videoRef.current && isVideoReady)) return;
 
     let animationFrameId: number;
-    
+
     const updateProgress = () => {
       const video = videoRef.current;
       if (video && videoDuration && !video.paused && !video.ended) {
@@ -237,14 +276,17 @@ export const ReelVideo = ({
       }
     };
 
-    animationFrameId = requestAnimationFrame(updateProgress);
+    // Start animation if video is playing or should be playing
+    if (isPlaying || (videoRef.current && !videoRef.current.paused)) {
+      animationFrameId = requestAnimationFrame(updateProgress);
+    }
 
     return () => {
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
       }
     };
-  }, [isPlaying, videoDuration, setProgress]);
+  }, [isPlaying, videoDuration, setProgress, currentIndex, isVideoReady]); // Added isVideoReady to ensure video is loaded
 
   const handleEnded = () => {
     onEnded?.();
@@ -262,17 +304,21 @@ export const ReelVideo = ({
     if (video) {
       video.currentTime = 0;
       setProgress(0);
+      setIsVideoReady(false); // Reset ready state when changing videos
       if (isPlaying) {
-        video.play().catch(() => { });
+        // Small delay to ensure video is ready
+        setTimeout(() => {
+          video.play().catch(() => { });
+        }, 10);
       }
     }
-  }, [currentIndex]); // Only reset when index changes, not when pausing
-  
+  }, [currentIndex, setProgress]); // Only reset when index changes, not when pausing
+
   // Separate effect for play/pause without resetting
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-    
+
     if (isPlaying) {
       video.play().catch(() => { });
     } else {
@@ -280,12 +326,20 @@ export const ReelVideo = ({
     }
   }, [isPlaying]);
 
+  const handlePlay = () => {
+    // Force trigger animation when video actually starts playing
+    if (!isVideoReady) {
+      setIsVideoReady(true);
+    }
+  };
+
   return (
     <video
       className={cn('absolute inset-0 h-full w-full object-cover', className)}
       muted={isMuted}
       onEnded={handleEnded}
       onLoadedMetadata={handleLoadedMetadata}
+      onPlay={handlePlay}
       onTimeUpdate={handleTimeUpdate}
       playsInline
       ref={videoRef}
@@ -305,8 +359,15 @@ export const ReelImage = ({
   duration = 5,
   ...props
 }: ReelImageProps) => {
-  const { isPlaying, setDuration, setProgress, currentIndex, setCurrentIndex, data, progress } =
-    useReelContext();
+  const {
+    isPlaying,
+    setDuration,
+    setProgress,
+    currentIndex,
+    setCurrentIndex,
+    data,
+    progress,
+  } = useReelContext();
   const animationFrameRef = useRef<number>();
   const startTimeRef = useRef<number>();
   const pausedProgressRef = useRef<number>(0);
@@ -322,7 +383,7 @@ export const ReelImage = ({
   useEffect(() => {
     if (isPlaying) {
       const elapsedTime = (pausedProgressRef.current * duration) / 100;
-      startTimeRef.current = performance.now() - (elapsedTime * 1000);
+      startTimeRef.current = performance.now() - elapsedTime * 1000;
 
       const updateProgress = (currentTime: number) => {
         const elapsed = (currentTime - (startTimeRef.current || 0)) / 1000;
@@ -373,11 +434,21 @@ export const ReelImage = ({
 };
 
 export type ReelProgressProps = HTMLAttributes<HTMLDivElement> & {
-  children?: ((item: any, index: number, isActive: boolean, progress: number) => React.ReactNode);
+  children?: (
+    item: any,
+    index: number,
+    isActive: boolean,
+    progress: number
+  ) => React.ReactNode;
 };
 
-export const ReelProgress = ({ className, children, ...props }: ReelProgressProps) => {
-  const { progress, currentIndex, data, duration, isPlaying } = useReelContext();
+export const ReelProgress = ({
+  className,
+  children,
+  ...props
+}: ReelProgressProps) => {
+  const { progress, currentIndex, data, duration, isPlaying, isNavigating } =
+    useReelContext();
 
   if (typeof children === 'function') {
     return (
@@ -389,7 +460,7 @@ export const ReelProgress = ({ className, children, ...props }: ReelProgressProp
         {...props}
       >
         {data.map((item, index) => (
-          <div key={index} className="relative flex-1">
+          <div className="relative flex-1" key={index}>
             {children(
               item,
               index,
@@ -416,7 +487,7 @@ export const ReelProgress = ({ className, children, ...props }: ReelProgressProp
           key={index}
         >
           <div
-            className='absolute top-0 left-0 h-full bg-white'
+            className="absolute top-0 left-0 h-full bg-white"
             style={{
               width:
                 index < currentIndex
@@ -424,9 +495,11 @@ export const ReelProgress = ({ className, children, ...props }: ReelProgressProp
                   : index === currentIndex
                     ? `${progress}%`
                     : '0%',
-              transition: index === currentIndex && isPlaying 
-                ? 'none' 
-                : 'width 0.3s ease-out',
+              transition: isNavigating
+                ? 'none'
+                : index === currentIndex && isPlaying
+                  ? 'none'
+                  : 'width 0.3s ease-out',
             }}
           />
         </div>
@@ -446,18 +519,23 @@ export const ReelControls = ({ className, ...props }: ReelControlsProps) => {
     currentIndex,
     setCurrentIndex,
     data,
+    setIsNavigating,
   } = useReelContext();
   const totalItems = data?.length || 0;
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
+      setIsNavigating(true);
       setCurrentIndex(currentIndex - 1);
+      setTimeout(() => setIsNavigating(false), 50);
     }
   };
 
   const handleNext = () => {
     if (currentIndex < totalItems - 1) {
+      setIsNavigating(true);
       setCurrentIndex(currentIndex + 1);
+      setTimeout(() => setIsNavigating(false), 50);
     }
   };
 
@@ -472,7 +550,7 @@ export const ReelControls = ({ className, ...props }: ReelControlsProps) => {
     >
       <button
         aria-label="Previous"
-        className='rounded-full bg-white/20 p-2 backdrop-blur-sm transition-all hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-50'
+        className="rounded-full bg-white/20 p-2 backdrop-blur-sm transition-all hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-50"
         disabled={currentIndex === 0}
         onClick={handlePrevious}
       >
@@ -507,7 +585,7 @@ export const ReelControls = ({ className, ...props }: ReelControlsProps) => {
 
       <button
         aria-label="Next"
-        className='rounded-full bg-white/20 p-2 backdrop-blur-sm transition-all hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-50'
+        className="rounded-full bg-white/20 p-2 backdrop-blur-sm transition-all hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-50"
         disabled={currentIndex === totalItems - 1}
         onClick={handleNext}
       >
@@ -523,7 +601,8 @@ export const ReelNavigation = ({
   className,
   ...props
 }: ReelNavigationProps) => {
-  const { setCurrentIndex, currentIndex, data } = useReelContext();
+  const { setCurrentIndex, currentIndex, data, setIsNavigating } =
+    useReelContext();
   const totalItems = data?.length || 0;
 
   const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
@@ -533,10 +612,14 @@ export const ReelNavigation = ({
 
     if (x < width / 2) {
       if (currentIndex > 0) {
+        setIsNavigating(true);
         setCurrentIndex(currentIndex - 1);
+        setTimeout(() => setIsNavigating(false), 50);
       }
     } else if (currentIndex < totalItems - 1) {
+      setIsNavigating(true);
       setCurrentIndex(currentIndex + 1);
+      setTimeout(() => setIsNavigating(false), 50);
     }
   };
 
