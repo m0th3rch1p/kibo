@@ -254,6 +254,13 @@ export const ReelVideo = ({
     video.muted = isMuted;
   }, [isMuted]);
 
+  // Store progress when pausing
+  useEffect(() => {
+    if (!isPlaying) {
+      pausedProgressRef.current = progress;
+    }
+  }, [isPlaying, progress]);
+
   // Handle play/pause with duration-based progress
   useEffect(() => {
     const video = videoRef.current;
@@ -283,7 +290,6 @@ export const ReelVideo = ({
           }
         } else {
           setProgress(newProgress);
-          pausedProgressRef.current = newProgress;
           animationFrameRef.current = requestAnimationFrame(updateProgress);
         }
       };
@@ -291,7 +297,6 @@ export const ReelVideo = ({
       animationFrameRef.current = requestAnimationFrame(updateProgress);
     } else {
       video.pause();
-      pausedProgressRef.current = progress;
     }
 
     return () => {
@@ -306,7 +311,6 @@ export const ReelVideo = ({
     setProgress,
     setCurrentIndex,
     data,
-    progress,
   ]);
 
   // Reset video when index changes
