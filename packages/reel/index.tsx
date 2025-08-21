@@ -14,7 +14,6 @@ import type {
   ComponentProps,
   HTMLAttributes,
   MouseEventHandler,
-  TouchEventHandler,
   VideoHTMLAttributes,
 } from 'react';
 import {
@@ -27,7 +26,7 @@ import {
 } from 'react';
 import { cn } from '@/lib/utils';
 
-type ReelContextType<T = any> = {
+type ReelContextType<T = unknown> = {
   currentIndex: number;
   setCurrentIndex: (index: number) => void;
   isPlaying: boolean;
@@ -44,7 +43,7 @@ type ReelContextType<T = any> = {
   setIsNavigating: (navigating: boolean) => void;
 };
 
-const ReelContext = createContext<ReelContextType<any> | undefined>(undefined);
+const ReelContext = createContext<ReelContextType<unknown> | undefined>(undefined);
 
 const useReelContext = () => {
   const context = useContext(ReelContext);
@@ -54,7 +53,7 @@ const useReelContext = () => {
   return context;
 };
 
-export type ReelProps<T = any> = HTMLAttributes<HTMLDivElement> & {
+export type ReelProps<T = unknown> = HTMLAttributes<HTMLDivElement> & {
   data: T[];
   defaultIndex?: number;
   index?: number;
@@ -68,7 +67,7 @@ export type ReelProps<T = any> = HTMLAttributes<HTMLDivElement> & {
   autoPlay?: boolean;
 };
 
-export const Reel = <T = any>({
+export const Reel = <T = unknown>({
   className,
   children,
   data,
@@ -150,7 +149,7 @@ export const Reel = <T = any>({
 };
 
 export type ReelContentProps = HTMLAttributes<HTMLDivElement> & {
-  children: ((item: any, index: number) => React.ReactNode) | React.ReactNode;
+  children: ((item: unknown, index: number) => React.ReactNode) | React.ReactNode;
 };
 
 export const ReelContent = ({
@@ -158,7 +157,7 @@ export const ReelContent = ({
   children,
   ...props
 }: ReelContentProps) => {
-  const { currentIndex, data, currentItem } = useReelContext();
+  const { currentIndex, currentItem } = useReelContext();
 
   const renderContent = () => {
     if (typeof children === 'function') {
@@ -230,14 +229,18 @@ export const ReelVideo = ({
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video) {
+      return;
+    }
 
     video.muted = isMuted;
   }, [isMuted]);
 
   const handleLoadedMetadata = () => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video) {
+      return;
+    }
 
     const duration = video.duration;
     setVideoDuration(duration);
@@ -247,30 +250,38 @@ export const ReelVideo = ({
 
     // Start playing after metadata is loaded on initial mount
     if (isPlaying && currentIndex === 0) {
-      video.play().catch(() => { });
+      video.play().catch(() => {
+        // Ignore autoplay errors
+      });
     }
   };
 
   const handleTimeUpdate = () => {
     const video = videoRef.current;
-    if (!(video && videoDuration)) return;
+    if (!(video && videoDuration)) {
+      return;
+    }
 
     const currentTime = video.currentTime;
-    const progress = (currentTime / videoDuration) * 100;
+    const PERCENTAGE = 100;
+    const progress = (currentTime / videoDuration) * PERCENTAGE;
     setProgress(progress);
     onTimeUpdate?.(currentTime);
   };
 
   // Use requestAnimationFrame for smoother progress updates
   useEffect(() => {
-    if (!(videoRef.current && isVideoReady)) return;
+    if (!(videoRef.current && isVideoReady)) {
+      return;
+    }
 
     let animationFrameId: number;
+    const PERCENTAGE = 100;
 
     const updateProgress = () => {
       const video = videoRef.current;
       if (video && videoDuration && !video.paused && !video.ended) {
-        const progress = (video.currentTime / videoDuration) * 100;
+        const progress = (video.currentTime / videoDuration) * PERCENTAGE;
         setProgress(progress);
         animationFrameId = requestAnimationFrame(updateProgress);
       }
@@ -286,7 +297,7 @@ export const ReelVideo = ({
         cancelAnimationFrame(animationFrameId);
       }
     };
-  }, [isPlaying, videoDuration, setProgress, currentIndex, isVideoReady]); // Added isVideoReady to ensure video is loaded
+  }, [isPlaying, videoDuration, setProgress, isVideoReady]); // Added isVideoReady to ensure video is loaded
 
   const handleEnded = () => {
     onEnded?.();
@@ -307,20 +318,27 @@ export const ReelVideo = ({
       setIsVideoReady(false); // Reset ready state when changing videos
       if (isPlaying) {
         // Small delay to ensure video is ready
+        const PLAY_DELAY = 10;
         setTimeout(() => {
-          video.play().catch(() => { });
-        }, 10);
+          video.play().catch(() => {
+            // Ignore autoplay errors
+          });
+        }, PLAY_DELAY);
       }
     }
-  }, [currentIndex, setProgress]); // Only reset when index changes, not when pausing
+  }, [currentIndex, setProgress, isPlaying]); // Only reset when index changes, not when pausing
 
   // Separate effect for play/pause without resetting
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video) {
+      return;
+    }
 
     if (isPlaying) {
-      video.play().catch(() => { });
+      video.play().catch(() => {
+        // Ignore autoplay errors
+      });
     } else {
       video.pause();
     }
@@ -348,15 +366,23 @@ export const ReelVideo = ({
   );
 };
 
-export type ReelImageProps = ComponentProps<'img'> & {
+export type ReelImageProps = Omit<ComponentProps<'img'>, 'alt'> & {
   alt: string;
   duration?: number;
+  width?: number | string;
+  height?: number | string;
 };
+
+const DEFAULT_IMAGE_DURATION = 5;
+const MS_TO_SECONDS = 1000;
+const PERCENTAGE = 100;
 
 export const ReelImage = ({
   className,
   alt,
-  duration = 5,
+  duration = DEFAULT_IMAGE_DURATION,
+  width,
+  height,
   ...props
 }: ReelImageProps) => {
   const {
@@ -382,14 +408,14 @@ export const ReelImage = ({
   // Handle play/pause
   useEffect(() => {
     if (isPlaying) {
-      const elapsedTime = (pausedProgressRef.current * duration) / 100;
-      startTimeRef.current = performance.now() - elapsedTime * 1000;
+      const elapsedTime = (pausedProgressRef.current * duration) / PERCENTAGE;
+      startTimeRef.current = performance.now() - elapsedTime * MS_TO_SECONDS;
 
       const updateProgress = (currentTime: number) => {
-        const elapsed = (currentTime - (startTimeRef.current || 0)) / 1000;
-        const newProgress = (elapsed / duration) * 100;
+        const elapsed = (currentTime - (startTimeRef.current || 0)) / MS_TO_SECONDS;
+        const newProgress = (elapsed / duration) * PERCENTAGE;
 
-        if (newProgress >= 100) {
+        if (newProgress >= PERCENTAGE) {
           const totalItems = data?.length || 0;
 
           if (currentIndex < totalItems - 1) {
@@ -425,9 +451,14 @@ export const ReelImage = ({
   ]);
 
   return (
+    // biome-ignore lint/a11y/useAltText: Alt prop is passed as required prop
+    // biome-ignore lint/a11y/noImgElement: Image element is appropriate for static content
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       alt={alt}
       className={cn('absolute inset-0 h-full w-full object-cover', className)}
+      height={height}
+      width={width}
       {...props}
     />
   );
@@ -435,7 +466,7 @@ export const ReelImage = ({
 
 export type ReelProgressProps = HTMLAttributes<HTMLDivElement> & {
   children?: (
-    item: any,
+    item: unknown,
     index: number,
     isActive: boolean,
     progress: number
@@ -447,7 +478,7 @@ export const ReelProgress = ({
   children,
   ...props
 }: ReelProgressProps) => {
-  const { progress, currentIndex, data, duration, isPlaying, isNavigating } =
+  const { progress, currentIndex, data, isPlaying, isNavigating } =
     useReelContext();
 
   if (typeof children === 'function') {
@@ -523,11 +554,13 @@ export const ReelControls = ({ className, ...props }: ReelControlsProps) => {
   } = useReelContext();
   const totalItems = data?.length || 0;
 
+  const NAVIGATION_RESET_DELAY = 50;
+
   const handlePrevious = () => {
     if (currentIndex > 0) {
       setIsNavigating(true);
       setCurrentIndex(currentIndex - 1);
-      setTimeout(() => setIsNavigating(false), 50);
+      setTimeout(() => setIsNavigating(false), NAVIGATION_RESET_DELAY);
     }
   };
 
@@ -535,7 +568,7 @@ export const ReelControls = ({ className, ...props }: ReelControlsProps) => {
     if (currentIndex < totalItems - 1) {
       setIsNavigating(true);
       setCurrentIndex(currentIndex + 1);
-      setTimeout(() => setIsNavigating(false), 50);
+      setTimeout(() => setIsNavigating(false), NAVIGATION_RESET_DELAY);
     }
   };
 
@@ -553,6 +586,7 @@ export const ReelControls = ({ className, ...props }: ReelControlsProps) => {
         className="rounded-full bg-white/20 p-2 backdrop-blur-sm transition-all hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-50"
         disabled={currentIndex === 0}
         onClick={handlePrevious}
+        type="button"
       >
         <ChevronLeft className="h-5 w-5 text-white" />
       </button>
@@ -562,6 +596,7 @@ export const ReelControls = ({ className, ...props }: ReelControlsProps) => {
           aria-label={isPlaying ? 'Pause' : 'Play'}
           className="rounded-full bg-white/20 p-2 backdrop-blur-sm transition-all hover:bg-white/30"
           onClick={() => setIsPlaying(!isPlaying)}
+          type="button"
         >
           {isPlaying ? (
             <Pause className="h-5 w-5 text-white" />
@@ -574,6 +609,7 @@ export const ReelControls = ({ className, ...props }: ReelControlsProps) => {
           aria-label={isMuted ? 'Unmute' : 'Mute'}
           className="rounded-full bg-white/20 p-2 backdrop-blur-sm transition-all hover:bg-white/30"
           onClick={() => setIsMuted(!isMuted)}
+          type="button"
         >
           {isMuted ? (
             <VolumeX className="h-5 w-5 text-white" />
@@ -588,6 +624,7 @@ export const ReelControls = ({ className, ...props }: ReelControlsProps) => {
         className="rounded-full bg-white/20 p-2 backdrop-blur-sm transition-all hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-50"
         disabled={currentIndex === totalItems - 1}
         onClick={handleNext}
+        type="button"
       >
         <ChevronRight className="h-5 w-5 text-white" />
       </button>
@@ -604,29 +641,34 @@ export const ReelNavigation = ({
   const { setCurrentIndex, currentIndex, data, setIsNavigating } =
     useReelContext();
   const totalItems = data?.length || 0;
+  const NAVIGATION_RESET_DELAY = 50;
+  const HALF_WIDTH_DIVISOR = 2;
 
   const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const width = rect.width;
 
-    if (x < width / 2) {
+    if (x < width / HALF_WIDTH_DIVISOR) {
       if (currentIndex > 0) {
         setIsNavigating(true);
         setCurrentIndex(currentIndex - 1);
-        setTimeout(() => setIsNavigating(false), 50);
+        setTimeout(() => setIsNavigating(false), NAVIGATION_RESET_DELAY);
       }
     } else if (currentIndex < totalItems - 1) {
       setIsNavigating(true);
       setCurrentIndex(currentIndex + 1);
-      setTimeout(() => setIsNavigating(false), 50);
+      setTimeout(() => setIsNavigating(false), NAVIGATION_RESET_DELAY);
     }
   };
 
   return (
+    // biome-ignore lint/a11y/useKeyWithClickEvents: Navigation is handled via click zones
     <div
       className={cn('absolute inset-0 z-10 flex', className)}
       onClick={handleClick}
+      role="button"
+      tabIndex={0}
       {...props}
     >
       <div className="flex-1 cursor-pointer" />
