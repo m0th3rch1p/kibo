@@ -64,7 +64,7 @@
     "date-fns": "^4.1.0",
     "fumadocs-core": "15.3.3",
     "fumadocs-mdx": "11.6.7",
-    "fumadocs-typescript": "^4.0.4",
+    "fumadocs-typescript": "^4.0.6",
     "fumadocs-ui": "15.3.3",
     "import-in-the-middle": "^1.14.2",
     "lodash.groupby": "^4.6.0",
