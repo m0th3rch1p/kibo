@@ -22,7 +22,7 @@
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",
     "vaul": "^1.1.2",
-    "zod": "^4.0.17",
+    "zod": "^4.1.5",
     "radix-ui": "latest"
   },
   "devDependencies": {
