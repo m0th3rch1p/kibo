@@ -167,6 +167,8 @@
   --color-fd-popover: var(--popover);
   --color-fd-primary-foreground: var(--primary-foreground);
   --color-fd-ring: var(--ring);
+
+  --fd-nav-height: calc(var(--spacing) * 14);
 }
 
 h1,

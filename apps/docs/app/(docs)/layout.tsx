@@ -1,6 +1,7 @@
-import { DocsLayout } from "fumadocs-ui/layouts/notebook";
+import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import type { ReactNode } from "react";
 import { ConditionalContainer } from "../../components/conditional-container";
+import { Navbar } from "../../components/navbar";
 import { baseOptions } from "../../lib/layout.config";
 import { source } from "../../lib/source";
 
@@ -10,25 +11,10 @@ export default function DocsRootLayout({ children }: { children: ReactNode }) {
       <DocsLayout
         {...baseOptions}
         nav={{
-          ...baseOptions.nav,
-          mode: "top",
+          component: <Navbar />,
         }}
         sidebar={{
           collapsible: false,
-          tabs: [
-            {
-              title: "Docs",
-              url: "/docs",
-            },
-            {
-              title: "Components",
-              url: "/components",
-            },
-            {
-              title: "Blocks",
-              url: "/blocks",
-            },
-          ],
         }}
         tree={source.pageTree}
       >
