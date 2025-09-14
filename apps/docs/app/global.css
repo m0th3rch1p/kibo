@@ -177,9 +177,9 @@ h3 {
   @apply tracking-tight;
 }
 
-/* Fix Fumadocs theme toggle icons */
-[data-theme-toggle] svg {
-  @apply fill-none;
+/* Fix offset with custom nav */
+#nd-page {
+  margin-top: var(--fd-nav-height);
 }
 
 /* Hide tabs on desktop */
