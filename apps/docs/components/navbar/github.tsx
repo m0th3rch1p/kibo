@@ -20,7 +20,9 @@ export const GitHub = async ({ className }: GitHubProps) => {
       <a href="https://github.com/haydenbleasel/kibo" rel="noreferrer" target="_blank">
         <SiGithub />
         <span className="w-8 text-muted-foreground text-xs tabular-nums">
-          {new Intl.NumberFormat("en-US").format(json.stargazers_count)}
+          {new Intl.NumberFormat("en-US", {
+            notation: "compact",
+          }).format(json.stargazers_count)}
         </span>
       </a>
     </Button>

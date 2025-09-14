@@ -191,7 +191,7 @@ const config = {
       },
       {
         source: "/extensions",
-        destination: "/extensions/tiptap-extension-iframely",
+        destination: "/extensions/tiptap/iframely",
         permanent: true,
       },
     ];
