@@ -189,6 +189,11 @@ const config = {
         destination: "/components/theme-switcher",
         permanent: true,
       },
+      {
+        source: "/extensions",
+        destination: "/extensions/tiptap-extension-iframely",
+        permanent: true,
+      },
     ];
   },
 

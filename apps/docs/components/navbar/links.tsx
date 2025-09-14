@@ -23,7 +23,10 @@ export const Links = ({ className, links }: LinksProps) => (
         <NavigationMenuItem key={link.href}>
           <NavigationMenuLink
             asChild
-            className={cn(navigationMenuTriggerStyle(), "h-auto px-3 py-1.5")}
+            className={cn(
+              navigationMenuTriggerStyle(),
+              "h-auto bg-transparent px-3 py-1.5 shadow-none"
+            )}
           >
             <Link href={link.href}>{link.label}</Link>
           </NavigationMenuLink>
