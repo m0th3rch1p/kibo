@@ -27,7 +27,8 @@ const Layout = ({ children }: LayoutProps) => (
   >
     <body className="flex min-h-screen flex-col">
       <Banner variant="rainbow">
-        <span>Looking for the AI components? They're now</span>
+        <span className="hidden sm:inline">Looking for the AI components? They're now</span>
+        <span className="sm:hidden">AI Components are now</span>
         <a
           className="mx-1 font-semibold underline"
           href="https://ai-sdk.dev/elements?ref=kibo"
